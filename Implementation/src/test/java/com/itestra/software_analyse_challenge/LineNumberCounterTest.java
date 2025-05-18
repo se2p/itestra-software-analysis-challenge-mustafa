@@ -232,6 +232,17 @@ public class LineNumberCounterTest {
     }
 
     @Test
+    void testComputeLineNumberBonus_FileWithSimpleGetterMethodBadFormatting() throws IOException {
+        File file = createTempFileWithContent("""
+                public int getSize()
+                {
+                    return size;
+                }
+                """);
+        assertEquals(0, LineNumberCounter.computeLineNumberBonus(file));
+    }
+
+    @Test
     void testComputeLineNumberBonus_FileWithTwoGetterMethods() throws IOException {
         File file = createTempFileWithContent("""
                 public Instant getEventDateTime() {

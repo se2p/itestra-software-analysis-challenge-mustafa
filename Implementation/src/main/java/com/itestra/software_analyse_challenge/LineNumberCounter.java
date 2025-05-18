@@ -30,6 +30,7 @@ public class LineNumberCounter {
         boolean inGetter = false;
         int braceDepth = 0;
         Pattern getterPattern = Pattern.compile("^\\s*public\\s+[\\w<>\\[\\]]+\\s+get\\w+\\s*\\(\\s*\\)\\s*\\{?\\s*$");
+        Pattern getterBodyPattern = Pattern.compile("^\\s*return\\s+(this\\.)?\\w+\\s*;\\s*}?\\s*$");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -64,6 +65,12 @@ public class LineNumberCounter {
                 if (line.isEmpty() || line.startsWith("//")) continue;
 
                 if (inGetter) {
+                    if (!getterBodyPattern.matcher(line).matches() && !(line.equals("{") || line.equals("}"))) {
+                        inGetter = false;
+                        count += 2;
+                        continue;
+                    }
+
                     for (char c : line.toCharArray()) {
                         if (c == '{') braceDepth++;
                         else if (c == '}') braceDepth--;
